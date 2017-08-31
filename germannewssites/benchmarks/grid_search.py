@@ -32,7 +32,7 @@ class GridSearchBenchmark():
             print(parameter, parameters[parameter])
 
         result = []
-        score = ['f1_macro']
+        score = 'f1_macro'
         print("# Tuning hyper-parameters for %s" % score)
         print()
         result.append("# Tuning hyper-parameters for %s" % score)
