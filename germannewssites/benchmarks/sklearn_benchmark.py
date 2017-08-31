@@ -52,10 +52,20 @@ class SklearnBenchmark():
         self.n_folds = n_folds
 
     def run(self, X_train, y_train, X_test, y_test, profiler, output_folder_name):
+        directory_name = "results/{}".format(output_folder_name)
+
+        logger.info('Creating Evaluation Folder...')
+        try:
+            os.makedirs(directory_name)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                print("Evaluation already exists!")
+                raise
 
         skf = StratifiedKFold(y_train, n_folds=self.n_folds,
                               shuffle=True, random_state=123)
         fold = 1
+        cross_validation_report = []
         for train_index, test_index in skf:
             X_train_fold, y_train_fold = [X_train[i] for i in train_index], [y_train[i] for i in train_index]
             X_test_fold, y_test_fold = [X_train[i] for i in test_index], [y_train[i] for i in test_index]
@@ -68,24 +78,22 @@ class SklearnBenchmark():
 
             print(metrics.classification_report(y_test_fold, y_pred_fold))
             print(metrics.f1_score(y_test_fold, y_pred_fold, average='macro'))
+            cross_validation_report.append(metrics.classification_report(y_test_fold, y_pred_fold))
+            cross_validation_report.append("Macro-F1-Score: " + str(metrics.f1_score(y_test_fold, y_pred_fold, average='macro')))
 
             fold = fold + 1
+
+        #save cross_validation_report
+        with codecs.open(os.path.join(directory_name + "/cross_validation_report.txt"), 'w') as file:
+            for entry in cross_validation_report:
+                file.write(entry)
+            file.close()
 
         if X_test:
             #get target names as list
             le = preprocessing.LabelEncoder()
             le.fit(y_test)
             class_names = list(le.classes_)
-
-            directory_name = "results/{}".format(output_folder_name)
-
-            logger.info('Creating Evaluation Folder...')
-            try:
-                os.makedirs(directory_name)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    print("Evaluation already exists!")
-                    raise
 
             logger.info('Testing...')
             logger.info('Training on {} instances!'.format(len(X_train)))

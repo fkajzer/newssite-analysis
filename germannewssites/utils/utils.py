@@ -14,15 +14,14 @@ def get_classifier(method='linear'):
         #rbf kernel
         return SVC(C=1000, random_state=123)
     if 'knn' == method:
-        return KNN(n_jobs=-1)
+        return KNN()
     if 'random_forest' == method:
         return RandomForestClassifier(n_estimators=250,
                                       bootstrap=False,
                                       n_jobs=-1,
                                       random_state=123)
     if 'decision_tree' == method:
-        return DecisionTreeClassifier(n_jobs=-1,
-                                      random_state=123)
+        return DecisionTreeClassifier(random_state=123)
 
 def extract_part_of_speech(doc):
     token_list = []

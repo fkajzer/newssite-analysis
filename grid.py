@@ -15,7 +15,7 @@ if __name__ == '__main__':
     argparser.add_argument('-s', '--sites', dest='sites', type=int, default=5,
                            help='Set number of sites (3, 5)')
     argparser.add_argument('-f', '--feature', dest='feature', type=str, default="germannewssite",
-                           help='Set profiler to use (germannewssite, unigram, bigram, bigrampos, partofspeech)')
+                           help='Set profiler to use (germannewssite, uni-bigram, bigrampos, partofspeech, sentiment)')
     argparser.add_argument('-c', '--classifier', dest='classifier', type=str, default="linear_svc",
                            help='Set kernel for the classifier to use (linear_svc, knn, random_forest, decision_tree)')
 
@@ -37,27 +37,31 @@ if __name__ == '__main__':
         features = ['bigrams', 'partofspeech']
     if args.feature == "partofspeech":
         features = ['partofspeech']
+    if args.feature == "sentiment":
+        features = ['sentiment']
 
     if args.classifier == "linear_svc":
         parameters = {
-            'classifier__C': (100, 1000, 10000),
+            'classifier__C': (1.0 , 100, 1000),
+            'classifier__tol': (1e-3 , 1e-4, 1e-5),
         }
     if args.classifier == "svc":
         parameters = {
-            'classifier__C': (100, 1000, 10000),
-            'classifier__gamma': ('auto', 6, 2, 0.125)
+            #first grid search has shown that only gamma affects
+            #'classifier__C': (128, 512, 2048),
+            'classifier__gamma': (0.5, 0.125, 0.03125, 0.0078125)
         }
     if args.classifier == "knn":
         parameters = {
-            'classifier__C__n_neighbors': (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
+            'classifier__n_neighbors': (5,10,15,20)
         }
     if args.classifier == "random_forest":
         parameters = {
-            'classifier__C__n_estimators': (100, 200, 250)
+            'classifier__n_estimators': (100, 200, 250)
         }
     if args.classifier == "decision_tree":
         parameters = {
-            'classifier__C__max_depth': (None, 5, 10)
+            'classifier__max_depth': (None, 5, 10)
         }
 
     profiler_instance = GermanNewssiteProfiler(method=classifier, features=features)

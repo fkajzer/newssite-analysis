@@ -39,6 +39,8 @@ if __name__ == '__main__':
         features = ['bigrams', 'partofspeech']
     if args.feature == "partofspeech":
         features = ['partofspeech']
+    if args.feature == "sentiment":
+        features = ['sentiment']
 
     profiler_instance = GermanNewssiteProfiler(method=classifier, features=features)
 
