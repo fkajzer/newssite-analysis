@@ -1,5 +1,3 @@
-from ..utils.utils import extract_sentences
-
 class SentenceConcat(object):
     def __init__(self, only_first=False):
             self.only_first = only_first
@@ -8,4 +6,4 @@ class SentenceConcat(object):
         if self.only_first:
             return doc['0']['sentence']
 
-        return "".join(extract_sentences(doc))
+        return "".join([(doc[sentence]['sentence']) for sentence in doc])

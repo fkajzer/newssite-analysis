@@ -1,17 +1,58 @@
 from sklearn.cross_validation import StratifiedKFold
-from sklearn.metrics import accuracy_score
 from sklearn import metrics
-import logging
+from sklearn import preprocessing
 
+import itertools
+import matplotlib.pyplot as plt
+import numpy as np
+import logging
+import os, errno
+import codecs
 
 logger = logging.getLogger(__name__)
+def plot_confusion_matrix(cm, classes, filename,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting 'normalize=True'.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+    plt.savefig(filename)
 
 class SklearnBenchmark():
 
     def __init__(self, n_folds=5):
         self.n_folds = n_folds
 
-    def run(self, X_train, y_train, X_test, y_test, profiler):
+    def run(self, X_train, y_train, X_test, y_test, profiler, output_folder_name):
+
         skf = StratifiedKFold(y_train, n_folds=self.n_folds,
                               shuffle=True, random_state=123)
         fold = 1
@@ -22,56 +63,61 @@ class SklearnBenchmark():
             profiler.train(X_train_fold, y_train_fold)
             logger.info('Testing on fold {} with {} instances'.format(
                 fold, len(test_index)))
+
             y_pred_fold = profiler.predict(X_test_fold)
-            metrics.classification_report(y_test_fold, y_pred_fold)
+
+            print(metrics.classification_report(y_test_fold, y_pred_fold))
+            print(metrics.f1_score(y_test_fold, y_pred_fold, average='macro'))
+
             fold = fold + 1
 
-
-        ''' Testing grid search with basic Features '''
-        vectorizer = TfidfVectorizer(max_df=0.95, min_df=3)
-        X_train_grid = vectorizer.fit_transform(X_train)
-
-        tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
-                             'C': [1, 10, 100, 1000]},
-                            {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}]
-
-        scores = ['precision', 'recall']
-        for score in scores:
-            print("# Tuning hyper-parameters for %s" % score)
-            print()
-
-            clf = GridSearchCV(SVC(), tuned_parameters, n_jobs=-1)
-            clf.fit(X_train_grid, y_train)
-
-            print("Best parameters set found on development set:")
-            print()
-            print(clf.best_params_)
-            print()
-            print("Grid scores on development set:")
-            print()
-            means = clf.cv_results_['mean_test_score']
-            stds = clf.cv_results_['std_test_score']
-            for mean, std, params in zip(means, stds, clf.cv_results_['params']):
-                print("%0.3f (+/-%0.03f) for %r"
-                      % (mean, std * 2, params))
-            print()
-
-        '''
         if X_test:
+            #get target names as list
+            le = preprocessing.LabelEncoder()
+            le.fit(y_test)
+            class_names = list(le.classes_)
+
+            directory_name = "results/{}".format(output_folder_name)
+
+            logger.info('Creating Evaluation Folder...')
+            try:
+                os.makedirs(directory_name)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    print("Evaluation already exists!")
+                    raise
+
+            logger.info('Testing...')
             logger.info('Training on {} instances!'.format(len(X_train)))
             profiler.train(X_train, y_train)
             logger.info('Testing on {} instances!'.format(len(X_test)))
-            y_pred = profiler.predict(X_test)
+            y_predicted = profiler.predict(X_test)
 
-            # Print the classification report
-            print(metrics.classification_report(y_test, y_predicted,
-                                                target_names=dataset.target_names))
+            #save y_predicted
+            with codecs.open(os.path.join(directory_name + "/y_predicted.npy"), 'wb') as file:
+                np.save(file, y_predicted)
+                file.close()
 
-            # Print and plot the confusion matrix
-            cm = metrics.confusion_matrix(y_test, y_predicted)
-            print(cm)
+            # Print the classification report and save it
+            print(metrics.classification_report(y_test, y_predicted))
+            print(metrics.f1_score(y_test, y_predicted, average='macro'))
+            with codecs.open(os.path.join(directory_name + "/classification_report.txt"), 'w') as file:
+                file.write(metrics.classification_report(y_test, y_predicted))
+                file.write("Macro-F1-Score: " + str(metrics.f1_score(y_test, y_predicted, average='macro')))
+                file.close()
 
-            # import matplotlib.pyplot as plt
-            # plt.matshow(cm)
-            # plt.show()
-        '''
+            # Compute confusion matrix
+            cnf_matrix = metrics.confusion_matrix(y_test, y_predicted)
+            np.set_printoptions(precision=2)
+
+            # Plot non-normalized confusion matrix
+            plt.figure()
+            plot_confusion_matrix(cnf_matrix, classes=class_names, filename=directory_name + "/cm.png",
+                                  title='Confusion matrix, without normalization')
+
+            # Plot normalized confusion matrix and save it
+            plt.figure()
+            plot_confusion_matrix(cnf_matrix, classes=class_names, filename=directory_name + "/cm_normalized.png", normalize=True,
+                                  title='Normalized confusion matrix')
+
+            plt.close()

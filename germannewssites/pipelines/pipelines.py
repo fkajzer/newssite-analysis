@@ -1,19 +1,22 @@
-from germannewssites.features.punctuation_features import PunctuationFeatures
+from germannewssites.features.part_of_speech_features import PartOfSpeechFeatures
 from germannewssites.preprocessors.sentence_concat import SentenceConcat
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
+from ..tokenizer.token_filter import TokenFilter
 
-def punctuation_features():
-    pipeline = Pipeline([('feature', PunctuationFeatures()),
+def part_of_speech_features():
+    pipeline = Pipeline([('feature', PartOfSpeechFeatures()),
                          ('tfidf', TfidfTransformer(sublinear_tf=False)),
                          ('scale', Normalizer())])
-    return ('punctuation_features', pipeline)
+    return ('part_of_speech_features', pipeline)
 
 def word_unigrams():
     vectorizer = CountVectorizer(min_df=2,
-                                 preprocessor=SentenceConcat(),
+                                 lowercase=False,
+                                 tokenizer=TokenFilter(),
                                  ngram_range=(1, 1))
     pipeline = Pipeline([('vect', vectorizer),
                          ('tfidf', TfidfTransformer(sublinear_tf=True)),
@@ -21,10 +24,16 @@ def word_unigrams():
     return ('word_unigrams', pipeline)
 
 def word_bigrams():
-    pipeline = Pipeline([('vect', CountVectorizer(ngram_range=(2, 2), preprocessor=SentenceConcat())),
+    pipeline = Pipeline([('vect', CountVectorizer(ngram_range=(2, 2), lowercase=False, tokenizer=TokenFilter())),
                          ('tfidf', TfidfTransformer(sublinear_tf=True)),
                          ('scale', Normalizer())])
     return ('word_bigrams', pipeline)
+
+def unigrams_bigrams():
+    pipeline = Pipeline([('vect', CountVectorizer(ngram_range=(1, 2), lowercase=False, tokenizer=TokenFilter())),
+                         ('tfidf', TfidfTransformer(sublinear_tf=True)),
+                         ('scale', Normalizer())])
+    return ('unigrams_bigrams', pipeline)
 
 def char_ngrams():
     vectorizer = CountVectorizer(min_df=1,
@@ -35,3 +44,9 @@ def char_ngrams():
                          ('tfidf', TfidfTransformer(sublinear_tf=True)),
                          ('scale', Normalizer())])
     return ('char_ngrams', pipeline)
+
+def sentiment():
+    pipeline = Pipeline([
+            ('vect', TfidfVectorizer(lowercase=False, tokenizer=TokenFilter(['ADJ', 'VERB', 'ADV']))),
+            ('scale', Normalizer())])
+    return ('sentiment', pipeline)

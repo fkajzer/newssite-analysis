@@ -13,8 +13,8 @@ zeit_path = os.path.join(base_path, 'zeit_nlp.json')
 spiegel_path = os.path.join(base_path, 'spiegel_nlp.json')
 welt_path = os.path.join(base_path, 'welt_nlp.json')
 
-save_train = '../datasets/data/train'
-save_test = '../datasets/data/test'
+save_train = '../datasets/data/train/16k_5'
+save_test = '../datasets/data/test/5_sites'
 
 mapping = {'faz': faz_path,
            'sueddeutsche': sueddeutsche_path,
@@ -34,12 +34,14 @@ def extract_and_save(items, filename):
     docs_train = []
     docs_test = []
     values = [v for k,v in items.items()]
-    for i in range(10000):
+    print ("Elements in File: {}".format(len(values)))
+
+    for i in range(20000):
         try:
             x = random.choice(values)
         except IndexError:
             print("nothing found")
-        if i >= 8000:
+        if i >= 16000:
             docs_test.append(random.choice(values))
             continue
         docs_train.append(random.choice(values))
