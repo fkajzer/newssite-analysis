@@ -32,34 +32,34 @@ class GridSearchBenchmark():
             print(parameter, parameters[parameter])
 
         result = []
-        scores = ['precision', 'recall']
-        for score in scores:
-            print("# Tuning hyper-parameters for %s" % score)
-            print()
-            result.append("# Tuning hyper-parameters for %s" % score)
+        score = ['f1_macro']
+        print("# Tuning hyper-parameters for %s" % score)
+        print()
+        result.append("# Tuning hyper-parameters for %s" % score)
 
-            # debug level verbosity the higher the more prints
-            grid_search = GridSearchCV(profiler.pipeline, parameters, n_jobs=-1, verbose=10, scoring='f1_macro')
-            grid_search.fit(X_train, y_train)
+        # debug level verbosity the higher the more prints
+        grid_search = GridSearchCV(profiler.pipeline, parameters, n_jobs=-1, verbose=10, scoring=score)
+        grid_search.fit(X_train, y_train)
 
-            print("Best parameters set found on development set:")
-            print()
-            print(grid_search.best_params_)
-            result.append("Best parameters set found on development set:")
-            result.append(str(grid_search.best_params_))
+        print("Best parameters set found on development set:")
+        print()
+        print(grid_search.best_params_)
+        result.append("Best parameters set found on development set:")
+        result.append(str(grid_search.best_params_))
 
-            print()
-            print("Grid scores on development set:")
-            print()
-            result.append("Grid scores on development set:")
-            means = grid_search.cv_results_['mean_test_score']
-            stds = grid_search.cv_results_['std_test_score']
-            for mean, std, params in zip(means, stds, grid_search.cv_results_['params']):
-                print("%0.3f (+/-%0.03f) for %r"
-                      % (mean, std * 2, params))
-                result.append("%0.3f (+/-%0.03f) for %r"
-                      % (mean, std * 2, params))
-            print()
+        print()
+        print("Grid scores on development set:")
+        print()
+        result.append("Grid scores on development set:")
+        means = grid_search.cv_results_['mean_test_score']
+        stds = grid_search.cv_results_['std_test_score']
+        for mean, std, params in zip(means, stds, grid_search.cv_results_['params']):
+            print("%0.3f (+/-%0.03f) for %r"
+                  % (mean, std * 2, params))
+            result.append("%0.3f (+/-%0.03f) for %r"
+                  % (mean, std * 2, params))
+        print()
+
         with codecs.open(os.path.join(directory_name + "/grid_search_result.txt"), 'w') as file:
             for line in result:
                 file.write(line + '\n')

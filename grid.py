@@ -38,6 +38,10 @@ if __name__ == '__main__':
     if args.feature == "partofspeech":
         features = ['partofspeech']
 
+    if args.classifier == "linear_svc":
+        parameters = {
+            'classifier__C': (100, 1000, 10000),
+        }
     if args.classifier == "svc":
         parameters = {
             'classifier__C': (100, 1000, 10000),

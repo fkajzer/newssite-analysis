@@ -11,6 +11,7 @@ def get_classifier(method='linear'):
     if 'linear_svc' == method:
         return LinearSVC(C=1000, multi_class='ovr', random_state=123)
     if 'svc' == method:
+        #rbf kernel
         return SVC(C=1000, random_state=123)
     if 'knn' == method:
         return KNN(n_jobs=-1)
