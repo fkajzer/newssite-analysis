@@ -42,22 +42,26 @@ if __name__ == '__main__':
 
     if args.classifier == "linear_svc":
         parameters = {
-            'classifier__C': (1.0 , 100, 1000),
-            'classifier__tol': (1e-3 , 1e-4, 1e-5),
+            'classifier__C': (0.1, 1.0 , 100),
+            'classifier__tol': (1e-2, 1e-3 , 1e-4, 1e-5, 1e-6),
+            #'classifier__tol': (1e-3 , 1e-4),
         }
     if args.classifier == "svc":
         parameters = {
-            #first grid search has shown that only gamma affects
+            #grid search has shown that only gamma affects result, C = 1.0 is default
+            'classifier__C': (0.1, 1.0 , 128, 512, 8192),
             #'classifier__C': (128, 512, 2048),
             'classifier__gamma': (0.5, 0.125, 0.03125, 0.0078125)
         }
     if args.classifier == "knn":
         parameters = {
-            'classifier__n_neighbors': (5,10,15,20)
+            'classifier__n_neighbors': (3,4,5,6,7,8,9,10)
         }
     if args.classifier == "random_forest":
         parameters = {
-            'classifier__n_estimators': (100, 200, 250)
+            #10 default
+            'classifier__n_estimators': (10, 125, 250, 500),
+            'classifier__bootstrap': (True, False),
         }
     if args.classifier == "decision_tree":
         parameters = {
