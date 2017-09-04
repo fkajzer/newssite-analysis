@@ -30,7 +30,7 @@ class GermanNewssiteProfiler():
             fs.append(punctuation_features())
         if 'char' in features:
             fs.append(char_ngrams())
-        if 'part_of_speech' in features:
+        if 'partofspeech' in features:
             fs.append(part_of_speech_features())
         if 'sentiment' in features:
             fs.append(sentiment())

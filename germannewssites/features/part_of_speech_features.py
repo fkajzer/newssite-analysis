@@ -42,7 +42,6 @@ class PartOfSpeechFeatures(BaseEstimator):
     def transform(self, documents):
         '''extract all token for each document'''
         tokens_list = [extract_part_of_speech(doc) for doc in documents]
-
         X = np.array([
                 [self.avg_pos_count(tokens, 'PUNCT') for tokens in tokens_list],
                 [self.avg_pos_count(tokens, 'ADJ') for tokens in tokens_list],

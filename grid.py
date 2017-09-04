@@ -28,7 +28,7 @@ if __name__ == '__main__':
     X_train, y_train = load(data_set_destination)
 
     if args.feature == "germannewssite":
-        features = ['bigrams', 'char', 'part_of_speech'] #best feature combination
+        features = ['bigrams', 'char', 'partofspeech'] #best feature combination
     if args.feature == "unigram":
         features = ['unigram']
     if args.feature == "uni-bigram":
@@ -61,7 +61,6 @@ if __name__ == '__main__':
         parameters = {
             #10 default
             'classifier__n_estimators': (10, 125, 250, 500),
-            'classifier__bootstrap': (True, False),
         }
     if args.classifier == "decision_tree":
         parameters = {

@@ -9,7 +9,7 @@ from ..tokenizer.token_filter import TokenFilter
 
 def part_of_speech_features():
     pipeline = Pipeline([('feature', PartOfSpeechFeatures()),
-                         ('tfidf', TfidfTransformer(sublinear_tf=True)),
+                         ('tfidf', TfidfTransformer(sublinear_tf=False)),
                          ('scale', Normalizer())])
     return ('part_of_speech_features', pipeline)
 

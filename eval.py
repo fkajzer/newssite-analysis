@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     #features = ['unigram', 'bigram', 'bigrams', 'punctuation', 'char', 'part_of_speech', 'sentiment']
     if args.feature == "germannewssite":
-        features = ['bigrams', 'char', 'part_of_speech'] #best feature combination
+        features = ['bigrams', 'char', 'partofspeech'] #best feature combination
     if args.feature == "unigram":
         features = ['unigram']
     if args.feature == "uni-bigram":
