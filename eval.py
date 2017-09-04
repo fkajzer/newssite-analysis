@@ -17,7 +17,7 @@ if __name__ == '__main__':
     argparser.add_argument('-f', '--features', dest='feature', type=str, default="germannewssite",
                            help='Set profiler to use (germannewssite, unigram, bigram, bigrampos, partofspeech)')
     argparser.add_argument('-c', '--classifier', dest='classifier', type=str, default="linear_svc",
-                           help='Set kernel for the classifier to use (linear_svc, knn, random_forest, decision_tree)')
+                           help='Set the classifier to use (linear_svc, knn, random_forest)')
 
     logging.basicConfig(level=getattr(logging, 'DEBUG'), format=LOGFMT)
     args = argparser.parse_args()
@@ -42,7 +42,27 @@ if __name__ == '__main__':
     if args.feature == "sentiment":
         features = ['sentiment']
 
+    if args.classifier == "linear_svc":
+        hyper_parameters = {
+            #'classifier__C': (0.001, 0.1, 1.0 , 10, 100, 1000),
+            'classifier__C': (0.1, 1.0),
+        }
+    if args.classifier == "svc":
+        hyper_parameters = {
+            'classifier__C': (0.001, 0.1 , 1.0, 10, 100, 1000),
+            'classifier__gamma': (0.01, 0.1, 1.0, 10)
+        }
+    if args.classifier == "knn":
+        hyper_parameters = {
+            'classifier__n_neighbors': (3,4,5,6,7,8,9,10)
+        }
+    if args.classifier == "random_forest":
+        hyper_parameters = {
+            #10 default
+            'classifier__n_estimators': (10, 125, 250, 500),
+        }
+
     profiler_instance = GermanNewssiteProfiler(method=classifier, features=features)
 
     benchmark = SklearnBenchmark()
-    benchmark.run(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, profiler=profiler_instance, output_folder_name=output_folder_name)
+    benchmark.run(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, profiler=profiler_instance, output_folder_name=output_folder_name, hyper_parameters=hyper_parameters)

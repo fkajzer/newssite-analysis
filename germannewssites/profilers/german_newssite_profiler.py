@@ -14,8 +14,6 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
-#nochmal grid search machen, aber ergebnisse absaven
-#test/ menge muss IMMER die gleiche sein!!!
 
 class GermanNewssiteProfiler():
     def __init__(self, method=None, features=None):
@@ -45,3 +43,6 @@ class GermanNewssiteProfiler():
 
     def predict(self, X):
         return self.model.predict(X)
+
+    def set_params(self, params):
+        self.pipeline.set_params(**params)

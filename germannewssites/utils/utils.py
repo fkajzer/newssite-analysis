@@ -9,19 +9,14 @@ from sklearn.tree import DecisionTreeClassifier
 
 def get_classifier(method='linear'):
     if 'linear_svc' == method:
-        return LinearSVC(C=1000, multi_class='ovr', random_state=123)
+        return LinearSVC(multi_class='ovr', random_state=123)
     if 'svc' == method:
-        #rbf kernel
-        return SVC(C=1000, random_state=123)
+        return SVC(random_state=123)
     if 'knn' == method:
         return KNN()
     if 'random_forest' == method:
-        return RandomForestClassifier(n_estimators=250,
-                                      bootstrap=False,
-                                      n_jobs=-1,
+        return RandomForestClassifier(n_jobs=-1,
                                       random_state=123)
-    if 'decision_tree' == method:
-        return DecisionTreeClassifier(random_state=123)
 
 def extract_part_of_speech(doc):
     token_list = []
