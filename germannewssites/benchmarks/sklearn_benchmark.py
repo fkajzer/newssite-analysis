@@ -89,6 +89,30 @@ def grid_search(X_train, y_train, profiler, parameters, directory_name):
 
     return grid_search.best_params_
 
+def cross_validation():
+    skf = StratifiedKFold(y_train, n_folds=n_folds, shuffle=True, random_state=123)
+    fold = 1
+    cross_validation_report = []
+    for train_index, test_index in skf:
+    X_train_fold, y_train_fold = [X_train[i] for i in train_index], [y_train[i] for i in train_index]
+    X_test_fold, y_test_fold = [X_train[i] for i in test_index], [y_train[i] for i in test_index]
+    logger.info('Training on {} instances!'.format(len(train_index)))
+    profiler.train(X_train_fold, y_train_fold)
+    logger.info('Testing on fold {} with {} instances'.format(
+    fold, len(test_index)))
+
+    y_pred_fold = profiler.predict(X_test_fold)
+    print(metrics.classification_report(y_test_fold, y_pred_fold))
+    print(metrics.f1_score(y_test_fold, y_pred_fold, average='macro'))
+    cross_validation_report.append(metrics.classification_report(y_test_fold, y_pred_fold))
+    cross_validation_report.append("Macro-F1-Score: " + str(metrics.f1_score(y_test_fold, y_pred_fold, average='macro')))
+    fold = fold + 1
+
+#save cross_validation_report
+with codecs.open(os.path.join(directory_name + "/cross_validation_report.txt"), 'w') as file:
+  for entry in cross_validation_report:
+  file.write(entry)
+file.close()
 class SklearnBenchmark():
 
     def __init__(self, n_folds=5):
@@ -105,6 +129,7 @@ class SklearnBenchmark():
                 print("Evaluation already exists!")
                 raise
         best_parameters = grid_search(X_train=X_train, y_train=y_train, profiler=profiler, parameters=hyper_parameters, directory_name=directory_name)
+        #cross_validation(X_train=X_train, y_train=y_train, profiler=profiler, output_folder_name=output_folder_name)
 
         if X_test:
             profiler.set_params(best_parameters)
