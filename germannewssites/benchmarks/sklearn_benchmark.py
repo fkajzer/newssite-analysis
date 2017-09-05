@@ -85,7 +85,7 @@ def grid_search(X_train, y_train, profiler, parameters, directory_name):
     print()
 
     time_elapsed = datetime.now() - start_time
-    grid_search_report.append('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+    grid_search_report.append('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
 
     with codecs.open(os.path.join(directory_name + "/grid_search_cv.txt"), 'w') as file:
         for line in grid_search_report:
@@ -115,7 +115,7 @@ def cross_validation():
         fold = fold + 1
 
     time_elapsed = datetime.now() - start_time
-    cross_validation_report.append('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+    cross_validation_report.append('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
     #save cross_validation_report
     with codecs.open(os.path.join(directory_name + "/cross_validation_report.txt"), 'w') as file:
         for entry in cross_validation_report:
@@ -163,7 +163,7 @@ class SklearnBenchmark():
             with codecs.open(os.path.join(directory_name + "/classification_report.txt"), 'w') as file:
                 file.write(metrics.classification_report(y_test, y_predicted))
                 file.write("Macro-F1-Score: " + str(metrics.f1_score(y_test, y_predicted, average='macro')))
-                file.write('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+                file.write('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
                 file.close()
             #save y_predicted
             with codecs.open(os.path.join(directory_name + "/y_predicted.npy"), 'wb') as file:

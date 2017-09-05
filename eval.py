@@ -14,8 +14,6 @@ if __name__ == '__main__':
                            help='Set data amount (1k, 2k, 4k, 8k, 16k)')
     argparser.add_argument('-s', '--sites', dest='sites', type=int, default=5,
                            help='Set number of sites (3, 5)')
-    argparser.add_argument('-f', '--features', dest='feature', type=str, default="germannewssite",
-                           help='Set profiler to use (germannewssite, unigram, bigram, bigrampos, partofspeech)')
     argparser.add_argument('-c', '--classifier', dest='classifier', type=str, default="linear_svc",
                            help='Set the classifier to use (linear_svc, knn, random_forest)')
 
@@ -23,29 +21,15 @@ if __name__ == '__main__':
     args = argparser.parse_args()
     data_set_destination = "{}_{}".format(args.data_set, args.sites)
     classifier = args.classifier
-    output_folder_name = "{}_{}_{}_{}".format(args.data_set, args.sites, args.feature, args.classifier)
 
     X_train, y_train = load(data_set_destination)
     X_test, y_test = load_test(args.sites)
 
-    #features = ['unigram', 'bigram', 'bigrams', 'punctuation', 'char', 'part_of_speech', 'sentiment']
-    if args.feature == "germannewssite":
-        features = ['bigrams', 'char', 'partofspeech'] #best feature combination
-    if args.feature == "unigram":
-        features = ['unigram']
-    if args.feature == "uni-bigram":
-        features = ['bigrams']
-    if args.feature == "bigrampos":
-        features = ['bigrams', 'partofspeech']
-    if args.feature == "partofspeech":
-        features = ['partofspeech']
-    if args.feature == "sentiment":
-        features = ['sentiment']
+    features = ['unigram', 'bigram', 'bigrams', 'char', 'part_of_speech', 'germannewssite']
 
     if args.classifier == "linear_svc":
         hyper_parameters = {
-            #'classifier__C': (0.001, 0.1, 1.0 , 10, 100, 1000),
-            'classifier__C': (0.1, 1.0),
+            'classifier__C': (0.001, 0.01, 0.1, 1.0 , 10, 100, 1000),
         }
     if args.classifier == "svc":
         hyper_parameters = {
@@ -54,15 +38,18 @@ if __name__ == '__main__':
         }
     if args.classifier == "knn":
         hyper_parameters = {
-            'classifier__n_neighbors': (3,4,5,6,7,8,9,10)
+            'classifier__n_neighbors': (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
         }
     if args.classifier == "random_forest":
         hyper_parameters = {
-            #10 default
-            'classifier__n_estimators': (10, 125, 250, 500),
+            "classifier__n_estimators": (10, 50, 100, 200),
+            "classifier__criterion": ("gini", "entropy")
         }
 
-    profiler_instance = GermanNewssiteProfiler(method=classifier, features=features)
-
+    #run benchmark for each feature
     benchmark = SklearnBenchmark()
-    benchmark.run(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, profiler=profiler_instance, output_folder_name=output_folder_name, hyper_parameters=hyper_parameters)
+    for feature in features:
+        output_folder_name = "{}/{}/{}/{}".format(args.data_set, args.sites, feature, args.classifier)
+
+        profiler_instance = GermanNewssiteProfiler(method=classifier, feature=feature)
+        benchmark.run(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, profiler=profiler_instance, output_folder_name=output_folder_name, hyper_parameters=hyper_parameters)

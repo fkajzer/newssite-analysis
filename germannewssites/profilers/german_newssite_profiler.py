@@ -16,22 +16,24 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
 
 class GermanNewssiteProfiler():
-    def __init__(self, method=None, features=None):
+    def __init__(self, method=None, feature=None):
         fs = []
-        if 'unigram' in features:
+        if 'unigram' == feature:
             fs.append(word_unigrams())
-        if 'bigram' in features:
+        if 'bigram' == feature:
             fs.append(word_bigrams())
-        if 'bigrams' in features:
+        if 'uni-bigram' == feature:
             fs.append(unigrams_bigrams())
-        if 'punctuation' in features:
-            fs.append(punctuation_features())
-        if 'char' in features:
+        if 'char' == feature:
             fs.append(char_ngrams())
-        if 'partofspeech' in features:
+        if 'partofspeech' == feature:
             fs.append(part_of_speech_features())
-        if 'sentiment' in features:
+        if 'sentiment' == feature:
             fs.append(sentiment())
+        if 'germannewssite' == feature:
+            fs.append(unigrams_bigrams())
+            fs.append(char_ngrams())
+            fs.append(part_of_speech_features())
 
         fu = FeatureUnion(fs, n_jobs=1)
         self.pipeline = Pipeline([('features', fu),
