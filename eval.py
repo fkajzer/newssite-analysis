@@ -25,7 +25,7 @@ if __name__ == '__main__':
     X_train, y_train = load(data_set_destination)
     X_test, y_test = load_test(args.sites)
 
-    features = ['unigram', 'bigram', 'bigrams', 'char', 'part_of_speech', 'germannewssite']
+    features = ['unigram', 'bigram', 'uni-bigram', 'char', 'partofspeech', 'germannewssite']
 
     if args.classifier == "linear_svc":
         hyper_parameters = {
