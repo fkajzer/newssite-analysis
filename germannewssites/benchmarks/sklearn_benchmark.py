@@ -1,6 +1,7 @@
 from sklearn.model_selection import GridSearchCV
 from sklearn import metrics
 from sklearn import preprocessing
+from datetime import datetime
 
 import itertools
 import matplotlib.pyplot as plt
@@ -48,16 +49,17 @@ def plot_confusion_matrix(cm, classes, filename,
     plt.savefig(filename)
 
 def grid_search(X_train, y_train, profiler, parameters, directory_name):
+    start_time = datetime.now()
 
     print("Testing grid search with following parametes")
     for parameter in parameters:
         print(parameter, parameters[parameter])
 
-    result = []
+    grid_search_report = []
     score = 'f1_macro'
     print("# Tuning hyper-parameters for %s" % score)
     print()
-    result.append("# Tuning hyper-parameters for %s" % score)
+    grid_search_report.append("# Tuning hyper-parameters for %s" % score)
 
     # debug level verbosity the higher the more prints
     grid_search = GridSearchCV(profiler.pipeline, parameters, n_jobs=-1, verbose=10, scoring=score)
@@ -66,53 +68,60 @@ def grid_search(X_train, y_train, profiler, parameters, directory_name):
     print("Best parameters set found on development set:")
     print()
     print(grid_search.best_params_)
-    result.append("Best parameters set found on development set:")
-    result.append(str(grid_search.best_params_))
+    grid_search_report.append("Best parameters set found on development set:")
+    grid_search_report.append(str(grid_search.best_params_))
 
     print()
     print("Grid scores on development set:")
     print()
-    result.append("Grid scores on development set:")
+    grid_search_report.append("Grid scores on development set:")
     means = grid_search.cv_results_['mean_test_score']
     stds = grid_search.cv_results_['std_test_score']
     for mean, std, params in zip(means, stds, grid_search.cv_results_['params']):
         print("%0.3f (+/-%0.03f) for %r"
               % (mean, std * 2, params))
-        result.append("%0.3f (+/-%0.03f) for %r"
+        grid_search_report.append("%0.3f (+/-%0.03f) for %r"
               % (mean, std * 2, params))
     print()
 
+    time_elapsed = datetime.now() - start_time
+    grid_search_report.append('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+
     with codecs.open(os.path.join(directory_name + "/grid_search_cv.txt"), 'w') as file:
-        for line in result:
+        for line in grid_search_report:
             file.write(line + '\n')
         file.close()
 
     return grid_search.best_params_
 
 def cross_validation():
+    start_time = datetime.now()
+
     skf = StratifiedKFold(y_train, n_folds=n_folds, shuffle=True, random_state=123)
     fold = 1
     cross_validation_report = []
     for train_index, test_index in skf:
-    X_train_fold, y_train_fold = [X_train[i] for i in train_index], [y_train[i] for i in train_index]
-    X_test_fold, y_test_fold = [X_train[i] for i in test_index], [y_train[i] for i in test_index]
-    logger.info('Training on {} instances!'.format(len(train_index)))
-    profiler.train(X_train_fold, y_train_fold)
-    logger.info('Testing on fold {} with {} instances'.format(
-    fold, len(test_index)))
+        X_train_fold, y_train_fold = [X_train[i] for i in train_index], [y_train[i] for i in train_index]
+        X_test_fold, y_test_fold = [X_train[i] for i in test_index], [y_train[i] for i in test_index]
+        logger.info('Training on {} instances!'.format(len(train_index)))
+        profiler.train(X_train_fold, y_train_fold)
 
-    y_pred_fold = profiler.predict(X_test_fold)
-    print(metrics.classification_report(y_test_fold, y_pred_fold))
-    print(metrics.f1_score(y_test_fold, y_pred_fold, average='macro'))
-    cross_validation_report.append(metrics.classification_report(y_test_fold, y_pred_fold))
-    cross_validation_report.append("Macro-F1-Score: " + str(metrics.f1_score(y_test_fold, y_pred_fold, average='macro')))
-    fold = fold + 1
+        logger.info('Testing on fold {} with {} instances'.format(fold, len(test_index)))
+        y_pred_fold = profiler.predict(X_test_fold)
+        print(metrics.classification_report(y_test_fold, y_pred_fold))
+        print(metrics.f1_score(y_test_fold, y_pred_fold, average='macro'))
+        cross_validation_report.append(metrics.classification_report(y_test_fold, y_pred_fold))
+        cross_validation_report.append("Macro-F1-Score: " + str(metrics.f1_score(y_test_fold, y_pred_fold, average='macro')))
+        fold = fold + 1
 
-#save cross_validation_report
-with codecs.open(os.path.join(directory_name + "/cross_validation_report.txt"), 'w') as file:
-  for entry in cross_validation_report:
-  file.write(entry)
-file.close()
+    time_elapsed = datetime.now() - start_time
+    cross_validation_report.append('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+    #save cross_validation_report
+    with codecs.open(os.path.join(directory_name + "/cross_validation_report.txt"), 'w') as file:
+        for entry in cross_validation_report:
+            file.write(entry)
+    file.close()
+
 class SklearnBenchmark():
 
     def __init__(self, n_folds=5):
@@ -132,6 +141,8 @@ class SklearnBenchmark():
         #cross_validation(X_train=X_train, y_train=y_train, profiler=profiler, output_folder_name=output_folder_name)
 
         if X_test:
+            start_time = datetime.now()
+
             profiler.set_params(best_parameters)
 
             #get target names as list
@@ -145,17 +156,18 @@ class SklearnBenchmark():
             logger.info('Testing on {} instances!'.format(len(X_test)))
             y_predicted = profiler.predict(X_test)
 
-            #save y_predicted
-            with codecs.open(os.path.join(directory_name + "/y_predicted.npy"), 'wb') as file:
-                np.save(file, y_predicted)
-                file.close()
-
+            time_elapsed = datetime.now() - start_time
             # Print the classification report and save it
             print(metrics.classification_report(y_test, y_predicted))
             print(metrics.f1_score(y_test, y_predicted, average='macro'))
             with codecs.open(os.path.join(directory_name + "/classification_report.txt"), 'w') as file:
                 file.write(metrics.classification_report(y_test, y_predicted))
                 file.write("Macro-F1-Score: " + str(metrics.f1_score(y_test, y_predicted, average='macro')))
+                file.write('Time elpased (hh:mm:ss.ms) {}'.format(time_elapsed))
+                file.close()
+            #save y_predicted
+            with codecs.open(os.path.join(directory_name + "/y_predicted.npy"), 'wb') as file:
+                np.save(file, y_predicted)
                 file.close()
 
             # Compute confusion matrix
