@@ -26,6 +26,7 @@ if __name__ == '__main__':
     X_test, y_test = load_test(args.sites)
 
     features = ['unigram', 'bigram', 'uni-bigram', 'char', 'partofspeech', 'germannewssite']
+    #features = ['partofspeech']
 
     if args.classifier == "linear_svc":
         hyper_parameters = {
@@ -33,8 +34,8 @@ if __name__ == '__main__':
         }
     if args.classifier == "svc":
         hyper_parameters = {
-            'classifier__C': (0.001, 0.1 , 1.0, 10, 100, 1000),
-            'classifier__gamma': (0.01, 0.1, 1.0, 10)
+            'classifier__C': (0.001, 1.0, 100),
+            'classifier__gamma': (0.001, 0.01, 0.1, 1.0, 10)
         }
     if args.classifier == "knn":
         hyper_parameters = {
@@ -42,14 +43,16 @@ if __name__ == '__main__':
         }
     if args.classifier == "random_forest":
         hyper_parameters = {
-            "classifier__n_estimators": (10, 50, 100, 200),
-            "classifier__criterion": ("gini", "entropy")
+            "classifier__n_estimators": (10, 20, 50),
+            "classifier__max_depth": [10, 50, 100, None],
+            "classifier__min_samples_split": [2, 3, 10],
+            "classifier__min_samples_leaf": [1, 3, 10],
         }
 
     #run benchmark for each feature
     benchmark = SklearnBenchmark()
     for feature in features:
-        output_folder_name = "{}/{}/{}/{}".format(args.data_set, args.sites, feature, args.classifier)
+        output_folder_name = "{}/{}/{}/{}".format(args.data_set, args.sites, args.classifier, feature)
 
         profiler_instance = GermanNewssiteProfiler(method=classifier, feature=feature)
         benchmark.run(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, profiler=profiler_instance, output_folder_name=output_folder_name, hyper_parameters=hyper_parameters)
