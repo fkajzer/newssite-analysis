@@ -37,7 +37,10 @@ if __name__ == '__main__':
         features = [args.feature]
 
     if args.classifier == "none":
-        classifiers = ['svc', 'linear_svc', 'knn', 'random_forest']
+        classifiers = ['linear_svc', 'random_forest', 'knn']
+        #classifiers = ['random_forest'] # FOR 1k5 ILL DEFINED KNN
+        #classifiers = ['linear_svc', 'random_forest', 'knn'] # FOR 2k 5, SVC ALREADY DONE
+
     else:
         classifiers = [args.classifier]
 
@@ -55,12 +58,14 @@ if __name__ == '__main__':
             }
         if classifier == "knn":
             hyper_parameters = {
-                'classifier__n_neighbors': (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+                'classifier__n_neighbors': (1,5,10,15,20,25,30,35,40,45,50,60,70,80)
+
             }
         if classifier == "random_forest":
             hyper_parameters = {
-                "classifier__n_estimators": (10, 20, 50),
-                "classifier__max_depth": [10, 50, 100, None],
+                "classifier__n_estimators": (50),
+                #"classifier__max_depth": [10, 50, 100, None],
+                "classifier__max_depth": [100, None],
                 "classifier__min_samples_split": [2, 3, 10],
                 "classifier__min_samples_leaf": [1, 3, 10],
             }

@@ -1,2 +1,4 @@
 results/*
 results_grid_search/*
+raw_analysis/results/*
+raw_analysis/SentiWS*

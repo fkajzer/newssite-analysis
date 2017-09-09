@@ -137,13 +137,13 @@ class SklearnBenchmark():
             if e.errno != errno.EEXIST:
                 print("Evaluation already exists!")
                 raise
-        best_parameters = grid_search(X_train=X_train, y_train=y_train, profiler=profiler, parameters=hyper_parameters, directory_name=directory_name)
+        #best_parameters = grid_search(X_train=X_train, y_train=y_train, profiler=profiler, parameters=hyper_parameters, directory_name=directory_name)
         #cross_validation(X_train=X_train, y_train=y_train, profiler=profiler, output_folder_name=output_folder_name)
 
         if X_test:
             start_time = datetime.now()
 
-            profiler.set_params(best_parameters)
+            #profiler.set_params(best_parameters)
 
             #get target names as list
             le = preprocessing.LabelEncoder()
