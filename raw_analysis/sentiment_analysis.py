@@ -14,7 +14,7 @@ zeit_path = os.path.join(base_path, 'zeit_nlp.json')
 spiegel_path = os.path.join(base_path, 'spiegel_nlp.json')
 welt_path = os.path.join(base_path, 'welt_nlp.json')
 
-save = 'results'
+save = 'results/sentiments'
 
 file_mapping = {'faz': faz_path,
            'sueddeutsche': sueddeutsche_path,
@@ -97,7 +97,7 @@ def analyze_comments(comments, sentiment_map, pos_list):
 
 def analyze_site(site, comments, sentiment_map):
     scores = {}
-    pos_list = ['VERB', 'NOUN', 'ADJ', 'ADV', 'PROPN']
+    pos_list = ['VERB', 'NOUN', 'ADJ', 'ADV']
     print ("Comments in File: {}".format(len(comments)))
 
     scores["comments"] = len(comments)
@@ -148,7 +148,7 @@ def senti_ws(sites, items=None):
 
         site_scores = analyze_site(site, comments, sentiment_map)
 
-        with codecs.open(os.path.join(save, site + "_sentiment_scores.json"), 'w', encoding='utf-8') as file:
+        with codecs.open(os.path.join(save, site + "_sentiments.json"), 'w', encoding='utf-8') as file:
             json.dump(site_scores, file, ensure_ascii=False)
 
 if __name__ == "__main__":
