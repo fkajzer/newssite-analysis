@@ -17,9 +17,9 @@ if __name__ == '__main__':
     argparser.add_argument('-s', '--sites', dest='sites', type=int, default=5,
                            help='Set number of sites (3, 5)')
     argparser.add_argument('-c', '--classifier', dest='classifier', type=str, default="none",
-                           help='Set the classifier to use (linear_svc, knn, random_forest)')
+                           help='Set the classifier to use (svc, linear_svc, knn, random_forest)')
     argparser.add_argument('-f', '--feature', dest='feature', type=str, default="none",
-                           help='Set the feature to use (unigram, bigram, uni-bigram, char, germannewssite)')
+                           help='Set the feature to use (unigram, bigram, uni-bigram, char, partofspeech, germannewssite)')
 
     logging.basicConfig(level=getattr(logging, 'DEBUG'), format=LOGFMT)
     args = argparser.parse_args()
