@@ -214,6 +214,7 @@ def senti_ws(sites, items=None):
         with codecs.open(os.path.join(save, site + "_sentiments.json"), 'w', encoding='utf-8') as file:
             json.dump(site_scores, file, ensure_ascii=False)
 
+''' this script creates a json which contains all sentiments for each comment, sentence, and word of a site '''
 if __name__ == "__main__":
     #senti_ws(['faz', 'zeit', 'spiegel', 'welt', 'sueddeutsche'])
     evaluate_hit_rate(['faz', 'zeit', 'spiegel', 'welt', 'sueddeutsche'])

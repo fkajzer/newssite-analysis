@@ -271,6 +271,7 @@ def evaluate_intervals(sites, items=None):
         with codecs.open(os.path.join(output_folder, site + "_evaluation.json"), 'w', encoding='utf-8') as file:
             json.dump(site_scores, file, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
+''' evaluates the json files created by sentiment_analysis.py '''
 if __name__ == "__main__":
     #evaluate_sentiments(['faz', 'zeit', 'spiegel', 'welt', 'sueddeutsche'])
     #evaluate_intervals(['faz', 'zeit', 'spiegel', 'welt', 'sueddeutsche'])

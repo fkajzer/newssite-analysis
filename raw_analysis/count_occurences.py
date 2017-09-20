@@ -240,6 +240,7 @@ def counting_analysis(sites):
         with codecs.open(os.path.join(save, site + "_analysis.json"), 'w', encoding='utf-8') as file:
             json.dump(site_scores, file, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
+''' evaluates wordlength, reply_share, upvotes and comment_share for sites and their top users '''
 if __name__ == "__main__":
-    #counting_analysis(['faz', 'spiegel', 'zeit', 'welt', 'sueddeutsche'])
-    counting_analysis(['welt'])
+    counting_analysis(['faz', 'spiegel', 'zeit', 'welt', 'sueddeutsche'])
+    #counting_analysis(['welt'])
