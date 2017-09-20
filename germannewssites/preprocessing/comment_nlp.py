@@ -68,6 +68,7 @@ def save_nlp(nlp, items, filename):
     with codecs.open(os.path.join(base_path_save, filename + "_nlp.json"), 'w', encoding='utf-8') as file:
         json.dump(docs, file, ensure_ascii=False)
 
+''' run spacy over our raw data and save the results '''
 if __name__ == "__main__":
     file_name = mapping[sys.argv[1]]
     comment_items = read_file_to_json(file_name)

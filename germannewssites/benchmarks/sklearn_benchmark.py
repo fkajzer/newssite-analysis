@@ -137,13 +137,16 @@ class SklearnBenchmark():
             if e.errno != errno.EEXIST:
                 print("Evaluation already exists!")
                 raise
-        #best_parameters = grid_search(X_train=X_train, y_train=y_train, profiler=profiler, parameters=hyper_parameters, directory_name=directory_name)
+
+        #return best parameters from grid search with three-fold cross-validation
+        best_parameters = grid_search(X_train=X_train, y_train=y_train, profiler=profiler, parameters=hyper_parameters, directory_name=directory_name)
         #cross_validation(X_train=X_train, y_train=y_train, profiler=profiler, output_folder_name=output_folder_name)
 
         if X_test:
             start_time = datetime.now()
 
-            #profiler.set_params(best_parameters)
+            #use parameters from grid search
+            profiler.set_params(best_parameters)
 
             #get target names as list
             le = preprocessing.LabelEncoder()
@@ -159,7 +162,7 @@ class SklearnBenchmark():
             time_elapsed = datetime.now() - start_time
             # Print the classification report and save it
             print(metrics.classification_report(y_test, y_predicted))
-            print(metrics.f1_score(y_test, y_predicted, average='macro'))
+            #print(metrics.f1_score(y_test, y_predicted, average='macro'))
             with codecs.open(os.path.join(directory_name + "/classification_report.txt"), 'w') as file:
                 file.write(metrics.classification_report(y_test, y_predicted))
                 file.write("Macro-F1-Score: " + str(metrics.f1_score(y_test, y_predicted, average='macro')))

@@ -44,6 +44,7 @@ def parse_json_files(files_dir):
     logger.info('Parsed {} json files in {}'.format(len(docs), files_dir))
     return docs
 
+''' load dataset and return data and taget (X, y) '''
 def load_json_dataset(files_dir):
     X = parse_json_files(files_dir)
     y = []
@@ -51,8 +52,6 @@ def load_json_dataset(files_dir):
     for doc in X:
         y.append(doc["target"])
         del doc["target"]
-        #text_len = len(concat_sentences(doc))
-        #logger.info(u'chars={chars}'.format(chars=text_len))
 
     return X, y
 

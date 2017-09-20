@@ -51,16 +51,8 @@ def process_welt(comments):
         except:
             pass
 
-    for comment in comments:
-        try:
-            a_profile = comment["displayName"]
-            only_profiles.append(comment)
-        except:
-            pass
-
     site_scores = {}
     site_scores["site_analysis"] = analyze_site("welt", only_comments)
-    #site_scores["profile_analysis"] = analyze_welt_profiles(only_profiles)
 
     return site_scores
 
@@ -95,9 +87,13 @@ def analyze_all_comments(site, all_comments_len, comments):
                 user_comment_replies += 1
             user_comment_length += len(comment["content"].split(" "))
         if site == "welt":
-            user_comment_replies += int(comment["childCount"])
             user_comment_upvotes += int(comment["likes"])
             user_comment_length += len(comment["contents"].split(" "))
+            try:
+                parent = comment["parentId"]
+                user_comment_replies += 1
+            except:
+                pass
         if site == "sueddeutsche":
             if comment["parent"] is not None:
                 user_comment_replies += 1
@@ -161,13 +157,7 @@ def analyze_top_user(site, all_comment_results, comments):
         user_comment_sentiment = 0.0
 
         for comment in comments:
-            if (site not in ["welt", "sueddeutsche"] and comment["user_name"] == user) or (site == "welt" and comment['user']['displayName'] == user) or (site == "sueddeutsche" and comment['author']['name'] == user):
-                if site == "faz":
-                    user_comment_sentiment += analyze_sentiment(nlp, sentiment_map, comment["content"])
-                    for quote in comment["quote"]:
-                        user_comment_replies += 1
-                    user_comment_upvotes += int(comment["upvotes"])
-                    user_comment_length += len(comment["content"].split(" "))
+            if (site not in ["welt", "sueddeutsche", "faz"] and comment["user_name"] == user) or (site == "welt" and comment['user']['displayName'] == user) or (site == "sueddeutsche" and comment['author']['name'] == user):
                 if site == "zeit":
                     user_comment_sentiment += analyze_sentiment(nlp, sentiment_map, comment["content"])
                     if comment["quote"] is not None:
@@ -181,15 +171,27 @@ def analyze_top_user(site, all_comment_results, comments):
                     user_comment_length += len(comment["content"].split(" "))
                 if site == "welt":
                     user_comment_sentiment += analyze_sentiment(nlp, sentiment_map, comment["contents"])
-                    user_comment_replies += int(comment["childCount"])
                     user_comment_upvotes += int(comment["likes"])
                     user_comment_length += len(comment["contents"].split(" "))
+                    try:
+                        parent = comment["parentId"]
+                        user_comment_replies += 1
+                    except:
+                        pass
                 if site == "sueddeutsche":
                     if comment["parent"] is not None:
                         user_comment_replies += 1
                     user_comment_sentiment += analyze_sentiment(nlp, sentiment_map, comment["raw_message"])
                     user_comment_upvotes += int(comment["likes"])
                     user_comment_length += len(comment["raw_message"].split(" "))
+            elif site == "faz":
+                if user == comment['user_name']:
+                    user_comment_sentiment += analyze_sentiment(nlp, sentiment_map, comment["content"])
+                    user_comment_upvotes += int(comment["upvotes"])
+                    user_comment_length += len(comment["content"].split(" "))
+                for quote in comment["quote"]:
+                    if quote['user_name'] == user:
+                        user_comment_replies += 1
 
         if site != "spiegel":
             user_comment_scores["average_comment_upvotes"] = "{:.2f}".format(user_comment_upvotes / comment_len)
@@ -239,4 +241,5 @@ def counting_analysis(sites):
             json.dump(site_scores, file, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 if __name__ == "__main__":
-    counting_analysis(['faz', 'spiegel', 'zeit', 'welt', 'sueddeutsche'])
+    #counting_analysis(['faz', 'spiegel', 'zeit', 'welt', 'sueddeutsche'])
+    counting_analysis(['welt'])

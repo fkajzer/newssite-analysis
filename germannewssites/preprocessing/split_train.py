@@ -46,6 +46,7 @@ def extract_and_save(items, filename):
     with codecs.open(os.path.join(save_train, filename + "_train.json"), 'w', encoding='utf-8') as file:
         json.dump(docs_train, file, ensure_ascii=False)
 
+''' crates subsets of training set '''
 if __name__ == "__main__":
     file_name = mapping[sys.argv[1]]
     comment_items = read_file_to_json(file_name)

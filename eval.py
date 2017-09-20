@@ -30,31 +30,26 @@ if __name__ == '__main__':
     X_test, y_test = load_test(args.sites)
 
     if args.feature == "none":
-        #features = ['unigram', 'bigram', 'uni-bigram', 'char', 'partofspeech', 'germannewssite']
-        #features = ['partofspeech'] is giving ill results?
-        features = ['unigram', 'bigram', 'uni-bigram', 'char', 'germannewssite']
+        features = ['unigram', 'bigram', 'uni-bigram', 'char', 'partofspeech', 'germannewssite']
     else:
         features = [args.feature]
 
     if args.classifier == "none":
-        classifiers = ['linear_svc', 'random_forest', 'knn']
-        #classifiers = ['random_forest'] # FOR 1k5 ILL DEFINED KNN
-        #classifiers = ['linear_svc', 'random_forest', 'knn'] # FOR 2k 5, SVC ALREADY DONE
-
+        classifiers = ['svc', 'linear_svc', 'random_forest', 'knn']
     else:
         classifiers = [args.classifier]
 
-    #run benchmark for each feature
+    #run benchmark for each classifier and each feature
     benchmark = SklearnBenchmark()
     for classifier in classifiers:
         if classifier == "linear_svc":
             hyper_parameters = {
-                'classifier__C': (0.001, 0.01, 0.1, 1.0 , 10, 100, 1000),
+                'classifier__C': (0.001, 0.01, 0.1, 1.0 , 10, 100),
             }
         if classifier == "svc":
             hyper_parameters = {
-                'classifier__C': (0.001, 1.0, 100),
-                'classifier__gamma': (0.001, 0.01, 0.1, 1.0, 10)
+                'classifier__C': (1.0, 100, 1000),
+                'classifier__gamma': (1.0, 10, 100, 1000)
             }
         if classifier == "knn":
             hyper_parameters = {
@@ -63,7 +58,6 @@ if __name__ == '__main__':
             }
         if classifier == "random_forest":
             hyper_parameters = {
-                "classifier__n_estimators": (50),
                 #"classifier__max_depth": [10, 50, 100, None],
                 "classifier__max_depth": [100, None],
                 "classifier__min_samples_split": [2, 3, 10],
